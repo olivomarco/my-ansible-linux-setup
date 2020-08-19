@@ -1,0 +1,241 @@
+#Avahi daemon casues a lot of spam. Add rules for the following type of messages;
+#Feb  7 19:15:47 alias avahi-daemon[772]: Invalid query packet.
+#Feb  7 19:16:51 alias avahi-daemon[772]: last message repeated 5 times
+#Feb  7 19:35:46 alias avahi-daemon[772]: Invalid response packet from host 130.89.170.253.
+#Note that the next rule is ugly, but i'm not sure how to filter it otherwise (except stopping rsyslog from summaryzing)
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ avahi-daemon\[[0-9]+\]: last message repeated [0-9]+ time(s)?$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ avahi-daemon\[[0-9]+\]: Invalid query packet.$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ avahi-daemon\[[0-9]+\]: Invalid response packet from host [[:alnum:]:.]+.$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ avahi-daemon\[[0-9]+\]: Received response from host [[:alnum:].]+ with invalid source port [0-9]+ on interface '[[:alnum:]:.]+'$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ avahi-daemon\[[0-9]+\]: Registering new address record for [:0-9a-f]+ on [[:alnum:]]+\.\*.$
+#Remove like:
+#Feb  8 16:55:24 alias avahi-daemon[908]: Received response from host 130.89.164.246 with invalid source port 52031 on interface 'eth0.0'
+#Feb  8 16:55:23 alias avahi-daemon[908]: Invalid legacy unicast query packet.
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ avahi-daemon\[[0-9]+\]: Invalid legacy unicast query packet.$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ avahi-daemon\[[0-9]+\]: Received response with invalid source port [0-9]+ on interface '[[:alnum:].]+'$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ avahi-daemon\[[0-9]+\]: Invalid response packet.$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ CRON\[[0-9]+\]:.+$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ cron-apt: Get:
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ cron-apt: The following package was automatically installed and is no longer required:
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ cron-apt: Use 'apt-get autoremove' to remove it\.
+# Process accounting resumed
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ kernel: \[[\.0-9]+\] Process accounting resumed$
+# perf samples too long (KVM/X58/5 series chipset issue)
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ kernel: \[[\.0-9]+\] perf samples too long \([0-9]{3,5} > [0-9]{3,5}\), lowering kernel\.perf_event_max_sample_rate to [0-9]{3,5}$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ kernel: \[[\.0-9]+\] perf interrupt took too long \([0-9]{3,5} > [0-9]{3,5}\), lowering kernel\.perf_event_max_sample_rate to [0-9]{3,5}$
+# ext4 remounts
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ kernel: \[[\.0-9]+\] EXT4-fs \([a-zA-Z]{2,3}-[0-9]{1,2}\): re-mounted\. Opts: \(null\)$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ kernel: \[[\.0-9]+\] list passed to list_sort\(\) too long for efficiency$
+#Lines zoals:
+#Feb  6 17:21:26 alias ntpd[1030]: clock is now synced
+#Feb  6 17:39:54 alias ntpd[1030]: clock is now unsynced
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ ntpd[[0-9]+]: clock is now synced$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ ntpd[[0-9]+]: clock is now unsynced$
+#Allow NTPD to make small adjustments to the local clock without spam
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ ntpd[[0-9]+]: adjusting local clock by (-)?[0-9].[0-9]+s$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ ntpd[[0-9]+]: adjusting clock frequency by (-)?[0-9]\.[0-9]+ to (-)?[0-9]{0,2}\.[0-9]+ppm$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ ntpd[[0-9]+]: skew change (-)?[0-9]+.[0-9]+ exceeds limit$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ ntpd[[0-9]+]: peer [[:alnum:]:\.]{7,39} now (valid|invalid)$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ ntpd[[0-9]+]: reply from [[:alnum:]:\.]{7,39}: not synced( \(alarm\))?, next query [0-9]+s$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ ntpd[[0-9]+]: reply from [[:alnum:]:\.]{7,39}: negative delay -0\.[0-9]+(, next query [0-9]+s)?$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ ntpd[[0-9]+]: (message repeated [0-9]{1,3} times: \[ )?sendto: Network is unreachable(\])$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ ntpd[[0-9]+]: peers refreshed$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ ntpd[[0-9]+]: new interface\(s\) found: waking up resolver$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ ntpd[[0-9]+]: Listen normally on [0-9]+ (eth|br)[0-9]+ [[:alnum:]:\.]{7,39} UDP [0-9]+$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ ntpd[[0-9]+]: [[:alnum:]:\.]{7,39} interface [[:alnum:]:\.]{7,39} -> ([[:alnum:]:\.]{7,39}|\(none\))$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ ntpd[[0-9]+]: Deleting interface \#[0-9]+ [[:alnum:]]{3,4}, [[:alnum:]:\.]{7,39}#[0-9]+, interface stats: received=[0-9]+, sent=[0-9=}, dropped=[0-9]+, active_time=[0-9]+ secs$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ postfix/smtp\[[[:digit:]]+\]: [[:alnum:]]+: replace: header
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ postfix/pipe\[[[:digit:]]+\]:.+delivered via omvnotificationfilter service.+$
+
+#Ignore UDP connects to public community on localhost
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ snmpd\[[0-9]+\]: Connection from UDP: \[127.0.0.1\]->\[127.0.0.1\]:-[0-9]+$
+# Logcheck rules for systemd, organized by component.
+
+# Automount
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd\[[[:digit:]]+\]: (Set up|Unset) automount .+\.$
+
+# Busname & Socket
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd\[[[:digit:]]+\]: (Closed|Listening on) .+\.$
+
+# Device
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd\[[[:digit:]]+\]: Expecting device [^[:space:]]+\.device\.\.\.$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd\[[[:digit:]]+\]: Found device [^[:space:]]+\.$
+
+# Device
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd\[[[:digit:]]+\]: Successfully loaded the IMA custom policy [^[:space:]]+\.$
+
+# Job & Service & Unit
+# FIXME:  Don't want to match "Stopped \(with error\) .+\.$"
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd\[[[:digit:]]+\]: (Started|Stopped|Reloaded) .+\.$
+# FIXME:  Don't want to match "Starting of .+ not supported\.$"
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd\[[[:digit:]]+\]: (Starting|Stopping|Reloading) .+\.$
+
+# Log
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd(-[^[:space:]]+)?\[[[:digit:]]+\]: Received SIG[^[:space:]]+( from PID [[:digit:]]+ \([^[:space:]]+\))?\.$
+
+# Main
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd\[[[:digit:]]+\]: (Reexecuting|Reloading|Shutting down|Switching root)\.$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd\[[[:digit:]]+\]: Detected architecture [^[:space:]]+\.$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd\[[[:digit:]]+\]: Detected virtualization [^[:space:]]+\.$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd\[[[:digit:]]+\]: RTC configured in localtime, applying delta of -?[[:digit:]]+ minutes to system time\.$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd\[[[:digit:]]+\]: Running in initial RAM disk\.$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd\[[[:digit:]]+\]: systemd [[:digit:]]+ running in (test )?system mode. \((\+[[:alnum:]]+ ?)+\)$
+
+# Manager
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd\[[[:digit:]]+\]: Startup finished in [[:digit:]]+ms\.$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd\[[[:digit:]]+\]: Time has been changed$
+
+# Mount
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd\[[[:digit:]]+\]: (Mounted|Unmounted) .+\.$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd\[[[:digit:]]+\]: Mounting .+\.\.\.$
+
+# PAM
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd: pam_unix\(systemd-user:session\): session (opened|closed) for user [^[:space:]]+( by \(uid=[[:digit:]]+\))?$
+
+# SELinux
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd\[[[:digit:]]+\]: Successfully loaded SELinux policy in [^[:space:]]+\.$
+
+# Smack
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd\[[[:digit:]]+\]: Successfully loaded Smack(/CIPSO)? policies\.$
+
+# Slice
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd\[[[:digit:]]+\]: (Created|Removed) slice User Slice of .+\.$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd\[[[:digit:]]+\]: (Created|Removed) slice [^[:space:]]+\.slice\.$
+
+# Swap
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd\[[[:digit:]]+\]: (Activated|Deactivated) swap .+\.$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd\[[[:digit:]]+\]: Activating swap .+\.\.\.$
+
+# Target
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd\[[[:digit:]]+\]: (Reached|Stopped) target .+\.$
+
+# Unit
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd\[[[:digit:]]+\]: [^[:space:]]+: Unit is bound to inactive unit [^[:space:]]+\. Stopping, too\.$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd\[[[:digit:]]+\]: [^[:space:]]+: Unit not needed anymore\. Stopping\.$
+
+# systemd-journald
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd-journald\[[[:digit:]]+\]: Received request to (flush|rotate) runtime journal from PID [[:digit:]]+$
+
+# systemd-logind
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd-logind\[[[:digit:]]+\]: New session [^[:space:]]+ of user [^[:space:]]+\.$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd-logind\[[[:digit:]]+\]: Removed session [^[:space:]]+\.$
+
+# systemd-sleep
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd-sleep\[[[:digit:]]+\]: Suspending system\.\.\.$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd-sleep\[[[:digit:]]+\]: System resumed\.$
+
+# systemd-timesyncd
+# Note:  Only required for systemd 218 and earlier due to
+#        https://bugs.freedesktop.org/show_bug.cgi?id=88926
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd-timesyncd\[[[:digit:]]+\]: interval/delta/delay/jitter/drift [[:digit:]]+s/(\+|-)[.[:digit:]]+s/-?[.[:digit:]]+s/-?[.[:digit:]]+s/(\+|-)[[:digit:]]+ppm( \(ignored\))?$
+
+# /etc/logcheck/ignore.d.server/local-rules
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ kernel: \[[. [:digit:]]+\] perf samples too long \([[:digit:]]+ > [0-9]+\), lowering kernel.perf_event_max_sample_rate to [[:digit:]]+$
+ntpd\[[0-9]+\]: adjusting clock frequency by [0-9]+\.[0-9]+ to [0-9]+\.[0-9]+ppm
+ntpd\[[0-9]+\]: adjusting clock frequency by [0-9]+\.[0-9]+ to -[0-9]+\.[0-9]+ppm
+ntpd\[[0-9]+\]: adjusting clock frequency by -[0-9]+\.[0-9]+ to [0-9]+\.[0-9]+ppm
+ntpd\[[0-9]+\]: adjusting clock frequency by -[0-9]+\.[0-9]+ to -[0-9]+\.[0-9]+ppm
+ntpd\[[0-9]+\]: adjusting local clock by [-]*[0-9]+\.[0-9]+s
+ntpd\[[0-9]+\]: bad peer from pool [0-9]+.debian.pool.ntp.org
+ntpd\[[0-9]+\]: Soliciting pool server
+ntpd\[[0-9]+\]: [0-9]+ out of [0-9]+ peers valid
+ntpd\[[0-9]+\]: reply from [\.0-9]+: not synced, next query [0-9]+s
+auditd\[[0-9]+\]: Audit daemon rotating log files
+kernel\[[0-9]+\]: \[[0-9]+\.[0-9]+\] INFO: NMI handler (perf_event_nmi_handler) took too long to run: [0-9]+.[0-9]+ msecs
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ kernel: \[[. [:digit:]]+\] hrtimer: interrupt took [[:digit:]]+ ns$
+rrdcached\[[0-9]+\]: Received FLUSHALL
+rrdcached\[[0-9]+\]: flushing old values
+rrdcached\[[0-9]+\]: removing old journal /var/lib/rrdcached/journal/rrd.journal.[0-9]+\.[0-9]+
+rrdcached\[[0-9]+\]: rotating journals
+rrdcached\[[0-9]+\]: started new journal /var/lib/rrdcached/journal/rrd.journal.[0-9]+\.[0-9]+
+systemd-logind\[[0-9]+\]: New session c[0-9]+ of user nobody.
+systemd-logind\[[0-9]+\]: New session [0-9]+ of user vagrant.
+systemd-logind\[[0-9]+\]: Removed session [0-9]+.
+systemd-logind\[[0-9]+\]: Removed session c[0-9]+.
+## suppress issues that arise with publicly available services that people try to exploit. https://gist.github.com/towo/9600375
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ sshd\[[[:digit:]]+\]: Did not receive identification string from ::ffff:[\.0-9]+$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ sshd\[[[:digit:]]+\]: fatal: Read from socket failed: Connection reset by peer \[preauth\]$
+#^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ sshd\[[[:digit:]]+\]: I(llegal|nvalid) user [^[:space:]]* from ([:.[:xdigit:]]+|UNKNOWN)$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ sshd\[[[:digit:]]+\]: invalid public DH value: <= 1 \[preauth\]$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ sshd\[[[:digit:]]+\]: Disconnecting: bad client public DH value \[preauth\]$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ sshd\[[[:digit:]]+\]: Disconnecting: Change of username or service not allowed: \([[:alpha:]]+,ssh-connection\) -> \([[:alpha:]]+,ssh-connection\) \[preauth\]$
+#^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ sshd\[[[:digit:]]+\]: Received disconnect from [:.[:xdigit:]]+: 3: com.jcraft.jsch.JSchException: Auth fail \[preauth\]$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ sshd\[[[:digit:]]+\]: error: Received disconnect from [:.[:xdigit:]]+: 3: com.jcraft.jsch.JSchException: Auth fail \[preauth\]$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ sshd\[[[:digit:]]+\]: Received disconnect from [\.0-9]+: 11: Bye Bye \[preauth\]$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ sshd\[[[:digit:]]+\]: Received disconnect from [:.[:xdigit:]]+: 11: Goodbye \[preauth\]$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ sshd\[[[:digit:]]+\]: Received disconnect from [:.[:xdigit:]]+: 11: PECL/ssh2 \(http://pecl.php.net/packages/ssh2\) \[preauth\]$
+##
+##dhclient\[[[:digit:]]+\]: DHCPREQUEST of [\.0-9]+ on eth0 to [\.0-9]+ port [0-9]+ (xid=0x[0-9a-f]+)
+#dhclient\[[0-9]+\]: DHCPREQUEST of [\.0-9]+ on eth0 to [\.0-9]+ port [0-9]+ (xid=0x[0-9a-f]+)
+sh\[[0-9]+\]: Generated new chapter thumbnails for
+sh\[[0-9]+\]: Warning: strange ID3v2 tag in
+sh\[[0-9]+\]: __code__:699: FutureWarning: The behavior of this method will change in future versions. Use specific 'len\(elem\)' or 'elem is not None' test instead.
+sh\[[0-9]+\]: self.processTRCK\( self.frameId, self.frameFlags, self.data \)
+sh\[[0-9]+\]: Got nothing for: Series None None
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ cron-apt: Del
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ cron-apt: Calculating upgrade\.\.\.
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ cron-apt: CRON-APT LINE:
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ rsyslogd-[0-9]+: action 'action 20' suspended, next retry is
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ rsyslogd-?[0-9]+: action 'action 20' resumed
+kernel: \[[0-9]+\.[0-9]+\] Peer .+ unexpectedly shrunk window .+ \(repaired\)
+openmediavault-update-smart-drivedb: Updating smartmontools .+ drive database \.\.\.
+cron-apt: The following packages were automatically installed and are no longer required:
+cron-apt: Use 'apt-get autoremove' to remove them\.
+openmediavault-webgui\[[[:digit:]]+\]: Authorized login from
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ kernel: \[.+\] kvm \[[0-9]+]: vcpu[0-9]+ unimplemented perfctr wrmsr:
+Exception AttributeError: "'ZipArchive' object has no attribute '_zip'" in
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd-timesyncd\[[0-9]+\]: Timed out waiting for reply from
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ systemd-timesyncd\[[0-9]+\]: Using NTP server
+transmission-daemon\[[0-9]+\]: .+ which was just downloaded, failed its checksum test
+systemd[\[0-9\]+]: Failed to reset devices.list on /system\.slice: Invalid argument
+systemd[\[0-9\]+]: Failed to reset devices.list on /machine\.slice: Invalid argument
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ rsyslogd[0-9\-]+: action 'action [0-9]+' suspended, next retry is
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ rsyslogd[0-9\-]+: action 'action [0-9]+' resumed
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ sshd\[[0-9\-]+\]: Connection closed by [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ port
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ systemd\[[0-9\-]+\]: .+\.timer: Adding .+ random time\.
+^\w{3} [ :0-9]{11} [. [:alnum:]-]+ liblogging-stdlog:.+rsyslogd was HUPed$
+^\w{3} [ :0-9]{11} [. [:alnum:]-]+ liblogging-stdlog:.+rsyslogd.+ exiting on signal.+$
+^\w{3} [ :0-9]{11} [. [:alnum:]-]+ liblogging-stdlog:.+rsyslogd.+ start$
+^\w{3} [ :0-9]{11} [. [:alnum:]-]+ liblogging-stdlog: warning.+action is deprecated, consider using the 'stop' statement instead.+$
+^\w{3} [ :0-9]{11} [. [:alnum:]-]+ sh\[[0-9]+\]: GUI:
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ sshd\[[[:digit:]]+\]: Accepted (gssapi(-with-mic|-keyex)?|rsa|dsa|password|publickey|keyboard-interactive/pam|hostbased) for [^[:space:]]+ from [^[:space:]]+ port [[:digit:]]+( (ssh|ssh2))?: (RSA|ECDSA|ED25519) (SHA256:)?[/+:[:alnum:]]+$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ postfix/smtpd\[[0-9]+\]: warning: dict_nis_init: NIS domain name not set - NIS lookups disabled
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ postfix/smtpd\[[0-9]+\]: disconnect from
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ monit\[[0-9]+\]: .+ cpu user usage.+
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ monit\[[0-9]+\]: .+ loadavg.+ matches resource limit.+
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ monit\[[0-9]+\]: .+ loadavg.+ check succeeded.+
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ proftpd\[[0-9]+\]: Stopping ftp server: proftpd.$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ proftpd\[[0-9]+\]: Starting ftp server: proftpd.$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ su\[[0-9]+\]: pam_[[:alnum:]]+\(su:session\): Cannot create session: Already running in a session$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ urbackupsrv: Login successful for admin from .+ via web interface
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ urbackupsrv: Client authentication failure for .+$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ urbackupclientbackend\[[0-9]+\]: ERROR: Creating shadowcopy of "root" failed.$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ urbackupclientbackend\[[0-9]+\]: ERROR: Token id for user.+not found$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ urbackupclientbackend\[[0-9]+\]: ERROR: Token id for group.+not found$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ urbackupclientbackend\[[0-9]+\]: ERROR: Error getting file type of.+$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ urbackupclientbackend\[[0-9]+\]: ERROR: Error getting extended attribute.+$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ urbackupclientbackend\[[0-9]+\]: ERROR: Error stating file .+ to get file tokens. Errno: 13$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ urbackupclientbackend\[[0-9]+\]: No LSB modules are available\.$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ sshd\[[0-9]+\]: Received disconnect from .+ disconnected by user$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ sshd\[[0-9]+\]: Disconnected from .+ port .+$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ postfix/pipe\[[0-9]+\]: .+ delivered via omvnotificationfilter service.+$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ systemd-logind\[[0-9]+\]: Watching system buttons on /dev/input/event.+$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ systemd\[[0-9]+\]: Configuration file .+ is marked executable\. Please remove executable permission bits\. Proceeding anyway\.$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ nmbd\[[0-9]+\]:.+source3/nmbd/nmbd_namequery\.c:.+$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ nmbd\[[0-9]+\]:.+query_name_response: Multiple \([0-9]+\) responses received for a query on subnet.+$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ nmbd\[[0-9]+\]:.+This response was from.+$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ ansible-setup: Invoked with.+$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ ansible-apt: Invoked with.+$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ ansible-apt: \[WARNING\] Could not find aptitude\. Using apt-get instead\.$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ sSMTP\[[0-9]+\]: Creating SSL connection to host
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ sSMTP\[[0-9]+\]: SSL connection using.+$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ sSMTP\[[0-9]+\]: Sent mail for.+$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ kernel: \[[0-9\.]+\] \[UFW BLOCK\].+$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ [a-f0-9]+\[[0-9]+\]: t=.+ lvl=info msg=".+$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ sshd\[[0-9]+\]: Invalid user .+ from .+ port [0-9]+$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ sshd\[[0-9]+\]: Received disconnect from .+ port [0-9]+.+$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ sshd\[[0-9]+\]: Did not receive identification string from .+ port [0-9]+$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ sshd\[[0-9]+\]: Unable to negotiate with .+ port [0-9]+: no matching cipher found. Their offer: .+$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ sshd\[[0-9]+\]: Unable to negotiate with .+ port [0-9]+: no matching key exchange method found. Their offer: .+$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ sshd\[[0-9]+\]: Bad protocol version identification .+$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ sshd\[[0-9]+\]: Connection reset by .+$

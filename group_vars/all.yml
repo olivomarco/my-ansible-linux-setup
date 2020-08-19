@@ -1,0 +1,30 @@
+---
+# general settings
+default_username: debian
+dot_forward_email: <YOUR_EMAIL_GOES_HERE>
+private_key: .ssh/id_rsa
+public_key: .ssh/id_rsa.pub
+ntpserver: pool.ntp.org
+timezone: Europe/Rome
+
+# default sshd port
+sshd_port: 22
+
+# generate random passwords for default user and root user
+default_password: "{{lookup('password', '/dev/null length=15 chars=ascii_letters,digits,punctuation')}}"
+root_password: "{{lookup('password', '/dev/null length=15 chars=ascii_letters,digits,punctuation')}}"
+
+# unattended packages install configuration
+unattended_mail: "{{dot_forward_email}}"
+unattended_remove_unused_dependencies: true
+unattended_automatic_reboot_time: "03:00"
+unattended_update_days: "Sat"
+unattended_clean_interval: 7
+
+# fail2ban
+fail2ban_loglevel: INFO
+fail2ban_services:
+  - name: ssh
+    port: ssh
+    filter: sshd
+    logpath: /var/log/auth.log

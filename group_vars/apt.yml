@@ -1,0 +1,48 @@
+---
+# packages to install
+packages_to_install:
+    - sudo
+    - python-apt
+    - git-core
+    - ufw
+    - dnsutils
+    - build-essential
+    - acl
+    - screen
+    - bash-completion
+    - ntp
+    - jq
+    - htop
+    - psmisc
+    - python-pip
+    - python3-pip
+    - vim
+    - netcat
+    - net-tools
+    - nmap
+    - lynx
+    - wget
+    - curl
+    - gzip
+    - rsync
+    - logrotate
+    # - logcheck
+    - rkhunter
+    - cryptsetup
+    - python-glade2
+    - dos2unix
+    - mlocate
+    - rclone
+    - bc
+    - zsh
+    - hddtemp
+    - lm-sensors
+    - qemu-guest-agent
+    - atop
+    - sshfs
+    - reptyr
+    - lvm2
+    - parted
+    - rename
+    - glances
+    - gnupg

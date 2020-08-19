@@ -1,0 +1,17 @@
+---
+- name: Configure /etc/network/interfaces
+  template:
+    src: "{{interfaces_template}}"
+    dest: /etc/network/interfaces
+  register: _configure_interfaces
+
+- block:
+  - name: Reboot for networking changes
+    shell: "sleep 5 && shutdown -r now 'Networking changes found, rebooting'"
+    async: 1
+    poll: 0
+
+  - name: Wait for server to come back online
+    wait_for_connection:
+        delay: 15
+    when: _configure_interfaces is changed

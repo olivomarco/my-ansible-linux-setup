@@ -1,0 +1,30 @@
+---
+# monit
+config_monit: true
+monit_enable_email_notifications: false
+monit_email_to: "{{dot_forward_email}}"
+monit_enable_web_server: false
+monit_web_server_allow_list:
+  - localhost
+monit_web_server_local_only: true
+monit_monitor_services:
+  - name: "cron"
+    monitored: true
+    pidfile: "/var/run/crond.pid"
+    start_program: "/usr/sbin/service cron start"
+    stop_program: "/usr/sbin/service cron stop"
+  - name: "fail2ban"
+    monitored: true
+    pidfile: "/var/run/fail2ban/fail2ban.pid"
+    start_program: "/etc/init.d/fail2ban start"
+    stop_program: "/etc/init.d/fail2ban stop"
+  - name: "sshd"
+    monitored: true
+    pidfile: "/var/run/sshd.pid"
+    start_program: "/etc/init.d/ssh start"
+    stop_program: "/etc/init.d/ssh stop"
+  - name: "syslogd"
+    monitored: true
+    pidfile: "/var/run/rsyslogd.pid"
+    start_program: "/etc/init.d/rsyslog start"
+    stop_program: "/etc/init.d/rsyslog stop"

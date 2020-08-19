@@ -1,0 +1,9 @@
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# eth0 network interface
+auto eth0
+allow-hotplug eth0
+iface eth0 inet dhcp
+    dns-search server

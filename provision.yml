@@ -1,0 +1,36 @@
+---
+- hosts: prod
+  vars_files:
+    - group_vars/all.yml
+    - group_vars/apt.yml
+    - group_vars/docker.yml
+    - group_vars/monit.yml
+    - group_vars/networking.yml
+    - group_vars/vault.yml
+  user: "{{default_username}}"  # run whole script with default user
+  become: yes
+  roles:  # order is not random!
+    - role: nickjj.fail2ban
+      tags: fail2ban
+    - role: common
+      tags: common
+    - role: ufw
+      tags: ufw
+    - role: user
+      tags: user
+    - role: ssh
+      tags: ssh
+    - role: nickjj.docker
+      tags: docker
+    - role: docker
+      tags: docker
+    - role: jnv.debian-backports
+      tags: common
+    - role: ansible-monit
+      tags: common
+    - role: jnv.unattended-upgrades
+      tags: common
+    - role: networking
+      tags: networking
+    - role: reboot
+      tags: reboot

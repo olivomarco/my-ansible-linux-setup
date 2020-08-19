@@ -1,0 +1,91 @@
+---
+- name: Update default user, belonging to sudo group
+  user:
+    name: "{{default_username}}"
+    password: "{{default_password | password_hash('sha512')}}"
+    groups: sudo
+    create_home: yes
+    shell: /bin/bash
+    generate_ssh_key: yes
+    ssh_key_bits: 2048
+    ssh_key_file: .ssh/id_rsa
+    update_password: always
+    state: present
+
+- name: Ensure sudo group has sudo privileges without password
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: "^%sudo"
+    line: "%sudo ALL=(ALL) NOPASSWD:ALL"
+    validate: "/usr/sbin/visudo -cf %s"
+
+# copy local files to remote
+- name: Install .forward file in users' folders
+  template:
+    src: dot.forward.j2
+    dest: "{{item}}/.forward"
+    owner: "{{default_username}}"
+    group: "{{default_username}}"
+  with_items:
+    - "/root"
+    - "/home/{{default_username}}"
+
+- name: Clone dotfiles repository
+  become_user: "{{item.user}}"
+  git:
+    repo: "https://github.com/olivomarco/dotfiles.git"
+    version: master
+    dest: "{{item.path}}"
+    accept_hostkey: yes
+    clone: yes
+    update: yes
+  with_items:
+    - {user: "{{default_username}}", path: "/home/{{default_username}}/dotfiles"}
+    - {user: "root", path: "/root/dotfiles"}
+
+# - name: Run dotfiles/setup/setup-user.sh for {{item.user}}
+#   become_user: "{{item.user}}"
+#   shell: "{{item.path}}/setup/setup-user.sh"
+#   with_items:
+#     - {user: "{{default_username}}", path: "/home/{{default_username}}/dotfiles"}
+#     - {user: "root", path: "/root/dotfiles"}
+
+- name: Change owner of dotfiles in {{default_username}} folder
+  file:
+    path: "/home/{{default_username}}/dotfiles"
+    owner: "{{default_username}}"
+    group: "{{default_username}}"
+    recurse: yes
+
+# other setup
+- name: Assign public ssh key to a variable
+  shell: cat /home/{{default_username}}/{{public_key}}
+  register: ssh_public_key
+
+- name: Add default username's public SSH key to its authorized_keys file
+  lineinfile:
+    dest: "/home/{{default_username}}/.ssh/authorized_keys"
+    line: "{{ssh_public_key.stdout}}"
+    state: present
+    create: yes
+
+- name: Change root password
+  user:
+    name: root
+    password: "{{root_password | password_hash('sha512')}}"
+    update_password: always
+
+- name: chsh to /usr/bin/zsh for default user and root
+  user:
+    name: "{{item}}"
+    shell: /usr/bin/zsh
+  with_items:
+    - "{{default_username}}"
+    - "root"
+
+- debug:
+    msg: "user '{{default_username}}' generated password: {{default_password}}"
+
+- debug:
+    msg: "user 'root' generated password: {{root_password}}"

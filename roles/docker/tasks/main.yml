@@ -1,0 +1,27 @@
+---
+- name: Ensure group "docker" exists
+  group:
+    name: docker
+    state: present
+
+- name: Ensure default user belongs also to docker group
+  user:
+    name: "{{default_username}}"
+    groups: docker
+    append: yes
+
+- name: Add rsyslog custom rules for Docker
+  copy:
+    src: templates/docker.conf
+    dest: /etc/rsyslog.d/docker.conf
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+
+- name: Add logrotate custom rules for Docker logs
+  copy:
+    src: templates/logrotate_docker
+    dest: /etc/logrotate.d/docker
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r

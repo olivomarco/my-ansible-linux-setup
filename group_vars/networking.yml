@@ -1,0 +1,14 @@
+---
+# Local LAN IP-range addresses
+local_lan: "192.168.0.0/16"
+docker_overlay_ips: "172.0.0.0/8"
+
+# ufw rules
+ufw_rules:
+  - {rule: allow, port: 22, src: "{{local_lan}}", proto: tcp, direction: "in"}
+  - {rule: allow, port: 22, src: "{{docker_overlay_ips}}", proto: tcp, direction: "in"}
+  # - {rule: allow, port: 80, src: "0.0.0.0/0", proto: tcp, direction: "in"}
+  # - {rule: allow, port: 443, src: "0.0.0.0/0", proto: tcp, direction: "in"}
+
+# network configuration for our server
+interfaces_template: "interfaces-dhcp-server.j2"
