@@ -1,4 +1,7 @@
 ---
+# flag to install or skip docker module installation and configuration
+install_docker: true
+
 # docker
 docker__channel: ["stable"]
 docker__version: "19.03.5"

@@ -21,8 +21,10 @@
     - role: ssh
       tags: ssh
     - role: nickjj.docker
+      when: install_docker == true
       tags: docker
     - role: docker
+      when: install_docker == true
       tags: docker
     - role: jnv.debian-backports
       tags: common
