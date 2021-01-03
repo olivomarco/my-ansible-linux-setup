@@ -46,3 +46,4 @@ packages_to_install:
     - rename
     - glances
     - gnupg
+    - exim4
